@@ -38,11 +38,6 @@ class BigInteger extends Number
 		return count($this->number);
 	}
 
-	protected function isPositive()
-	{
-		return $this->positive;
-	}
-	
 	/*
 	 * Remove zeros from the front of the number
 	 */
@@ -75,8 +70,13 @@ class BigInteger extends Number
 		return $result;
 	}
 	
+	public function isPositive()
+	{
+		return $this->positive;
+	}
+	
 	/*
-	 * Adds one digit to the Number.
+	 * Adds one digit to the Number
 	 */
 	protected function AddDigit()
 	{
@@ -84,7 +84,19 @@ class BigInteger extends Number
 	}
 	
 	/*
-	 * @param Number $number Number
+	 * @return BigInteger Absolute value of the number
+	 */
+	public function Abs()
+	{
+		$result = clone $this;
+		if (!$result->isPositive())
+		{
+			$result->Invert();
+		}
+		return $result;
+	}
+	/*
+	 * @param BigInteger $number Number
 	 * @return boolean
 	 */
 	public function More(BigInteger $number)
@@ -112,7 +124,7 @@ class BigInteger extends Number
 	}
 	
 	/*
-	 * @param Number $number Number
+	 * @param BigInteger $number Number
 	 * @return boolean
 	 */
 	public function Less(BigInteger $number)
@@ -121,7 +133,7 @@ class BigInteger extends Number
 	}
 	
 	/*
-	 * @param Number $number Number to be added
+	 * @param BigInteger $number Number to be added
 	 * @return BigInteger The sum of two numbers
 	 */
 	public function Plus(BigInteger $number)
@@ -177,7 +189,7 @@ class BigInteger extends Number
 	}
 
 	/*
-	 * @param Number $number Number to be subtracted
+	 * @param BigInteger $number Number to be subtracted
 	 * @return BigInteger The difference between two numbers
 	 */
 	public function Minus(BigInteger $number)
