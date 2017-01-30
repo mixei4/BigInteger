@@ -9,7 +9,6 @@ class BigInteger extends Number
 	
 	/* 
 	 * @param string $string 
-	 * @param integer $baseDigits Digits count in base - 1..9. Default is 9.
 	 */
 	public function __construct($string)
 	{
@@ -51,6 +50,33 @@ class BigInteger extends Number
 		}
 	}
 
+	/*
+	 * Bring number's digits to base boundaries
+	 */
+	protected function Normalize()
+	{
+		$i = 0;
+		while (($i < $this->length()))
+		{
+			if ($this->number[$i] >= self::base)
+			{
+				if (!isset($this->number[$i+1]))
+				{
+					$this->AddDigit();
+				}
+				$this->number[$i+1] += floor($this->number[$i] / self::base);
+				$this->number[$i] = $this->number[$i] % self::base;
+			}
+			else if ($this->number[$i] < 0)
+			{
+				$this->number[$i+1] -= ceil(-$this->number[$i] / self::base);
+				$this->number[$i] += ceil(-$this->number[$i] / self::base) * self::base;
+			}
+			$i++;
+		}
+		$this->removeZeros();
+	}
+	
 	/*
 	 * @return Number as string
 	 */
@@ -175,16 +201,7 @@ class BigInteger extends Number
 			}
 			$i++;
 		}
-		while (($i < $result->length()) && $result->number[$i] >= self::base)
-		{
-			if (!isset($result->number[$i+1]))
-			{
-				$result->AddDigit();
-			}
-			$result->number[$i+1] += floor($result->number[$i] / self::base);
-			$result->number[$i] = $result->number[$i] % self::base;
-			$i++;
-		}
+		$result->Normalize();
 		return $result;
 	}
 
@@ -223,13 +240,7 @@ class BigInteger extends Number
 			}
 			$i++;
 		}
-		while (($i < $result->length()) && $result->number[$i] < 0)
-		{
-			$result->number[$i+1] -= ceil(-$result->number[$i] / self::base);
-			$result->number[$i] += ceil(-$result->number[$i] / self::base) * self::base;
-			$i++;
-		}
-		$result->removeZeros();
+		$result->Normalize();
 		return $result;
 	}
 
