@@ -10,7 +10,6 @@ class BigInteger
 	
 	/* 
 	 * @param string $string 
-	 * @param integer $baseDigits Digits count in base - 1..9. Default is 9.
 	 */
 	public function __construct($string)
 	{
