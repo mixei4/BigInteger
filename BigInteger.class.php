@@ -1,12 +1,11 @@
 <?php
 namespace MiXa\Math;
 
-class BigInteger
+class BigInteger extends Number
 {
 	const baseDigits = 9;
 	const base = 1000000000;
 	private $number;
-	private $positive = true;
 	
 	/* 
 	 * @param string $string 
@@ -77,38 +76,18 @@ class BigInteger
 	}
 	
 	/*
-	 * Multiply current number by -1
-	 */
-	public function Invert()
-	{
-		$this->positive = !$this->positive;
-	}
-
-	/*
-	 * Multiply current number by -1 and return the new one
-	 * 
-	 * @return BigInteger Inverted number
-	 */
-	public function GetInverted()
-	{
-		$result = clone $this;
-		$result->Invert();
-		return $result;
-	}
-	
-	/*
 	 * Adds one digit to the Number.
 	 */
-	public function AddDigit()
+	protected function AddDigit()
 	{
 		array_push($this->number, 0);
 	}
 	
 	/*
-	 * @param BigInteger $number Number
+	 * @param Number $number Number
 	 * @return boolean
 	 */
-	public function More(BigInteger $number)
+	public function More(Number $number)
 	{
 		if ($this->length() > $number->length())
 		{
@@ -133,10 +112,10 @@ class BigInteger
 	}
 	
 	/*
-	 * @param BigInteger $number Number to be added
+	 * @param Number $number Number to be added
 	 * @return BigInteger The sum of two numbers
 	 */
-	public function Plus(BigInteger $number)
+	public function Plus(Number $number)
 	{
 		if (!$this->isPositive() && !$number->isPositive())
 		{
@@ -189,10 +168,10 @@ class BigInteger
 	}
 
 	/*
-	 * @param BigInteger $number Number to be subtracted
+	 * @param Number $number Number to be subtracted
 	 * @return BigInteger The difference between two numbers
 	 */
-	public function Minus(BigInteger $number)
+	public function Minus(Number $number)
 	{
 		if (!$number->isPositive())
 		{
@@ -234,4 +213,3 @@ class BigInteger
 	}
 
 }
-?>
