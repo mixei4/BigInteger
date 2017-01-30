@@ -127,7 +127,19 @@ class BigInteger extends Number
 	 */
 	public function More(BigInteger $number)
 	{
-		if ($this->length() > $number->length())
+		if (!$this->isPositive() && !$number->isPositive())
+		{
+			return $this->GetInverted()->Less($number->GetInverted());
+		}
+		else if (!$this->isPositive())
+		{
+			return false;
+		}
+		else if (!$number->isPositive())
+		{
+			return true;
+		}
+		else if ($this->length() > $number->length())
 		{
 			return true;
 		}
