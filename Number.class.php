@@ -3,7 +3,7 @@ namespace MiXa\Math;
 
 abstract class Number
 {
-	private $positive = true;
+	protected $positive = true;
 
 	/*
 	 * Multiply current number by -1
@@ -24,19 +24,5 @@ abstract class Number
 		$result->Invert();
 		return $result;
 	}
-	
-	abstract public function More(Number $number);
-	
-	/*
-	 * @param Number $number Number
-	 * @return boolean
-	 */
-	public function Less(Number $number)
-	{
-		return $number->More($this);
-	}
-	
-	abstract public function Plus(Number $number);
-	abstract public function Minus(Number $number);
 	
 }

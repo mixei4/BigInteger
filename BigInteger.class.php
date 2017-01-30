@@ -87,7 +87,7 @@ class BigInteger extends Number
 	 * @param Number $number Number
 	 * @return boolean
 	 */
-	public function More(Number $number)
+	public function More(BigInteger $number)
 	{
 		if ($this->length() > $number->length())
 		{
@@ -112,10 +112,19 @@ class BigInteger extends Number
 	}
 	
 	/*
+	 * @param Number $number Number
+	 * @return boolean
+	 */
+	public function Less(BigInteger $number)
+	{
+		return $number->More($this);
+	}
+	
+	/*
 	 * @param Number $number Number to be added
 	 * @return BigInteger The sum of two numbers
 	 */
-	public function Plus(Number $number)
+	public function Plus(BigInteger $number)
 	{
 		if (!$this->isPositive() && !$number->isPositive())
 		{
@@ -171,7 +180,7 @@ class BigInteger extends Number
 	 * @param Number $number Number to be subtracted
 	 * @return BigInteger The difference between two numbers
 	 */
-	public function Minus(Number $number)
+	public function Minus(BigInteger $number)
 	{
 		if (!$number->isPositive())
 		{
