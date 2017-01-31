@@ -30,6 +30,7 @@ class BigReal extends Number
 		}
 		$this->number = new BigInteger($stringLeft.$stringRight);
 		$this->shift = strlen($stringRight);
+		$this->positive = $this->number->isPositive();
 	}
 	
 	protected function isPositive()
@@ -37,6 +38,26 @@ class BigReal extends Number
 		return $this->number->isPositive();
 	}
 	
+	/*
+	 * Multiply current number by -1
+	 */
+	public function Invert()
+	{
+		$this->number->Invert();
+	}
+
+	/*
+	 * Multiply current number by -1 and return the new one
+	 * 
+	 * @return BigInteger Inverted number
+	 */
+	public function GetInverted()
+	{
+		$result = clone $this;
+		$result->Invert();
+		return $result;
+	}
+
 	/*
 	 * @return Number as string
 	 */
@@ -59,6 +80,46 @@ class BigReal extends Number
 			$result = '-'.$result;
 		}
 		return $result;
+	}
+	
+	/*
+	 * @param BigReal $number
+	 * @return boolean
+	 */
+	public function More(BigReal $number)
+	{
+		//echo 'More'.$this.'!'.$number.'<br>';
+		if (!$this->isPositive() && !$number->isPositive())
+		{
+			return $this->GetInverted()->Less($number->GetInverted());
+		}
+		else if (!$this->isPositive())
+		{
+			return false;
+		}
+		else if (!$number->isPositive())
+		{
+			return true;
+		}
+		else if ($this->shift != $number->shift)
+		{
+			$max = max($this->shift, $number->shift);
+			return $this->number->GetShifted($max - $this->shift)->More($number->number->GetShifted($max - $number->shift));
+		}
+		else
+		{
+			return $this->number->More($number->number);
+		}
+	}
+	
+	/*
+	 * @param BigReal $number
+	 * @return boolean
+	 */
+	public function Less(BigReal $number)
+	{
+		//echo 'Less'.$this.'!'.$number.'<br>';
+		return $number->More($this);
 	}
 	
 

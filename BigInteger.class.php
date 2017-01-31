@@ -6,6 +6,7 @@ class BigInteger extends Number
 	const baseDigits = 9;
 	const base = 1000000000;
 	private $number;
+	protected $positive = true;
 	
 	/* 
 	 * @param string $string 
@@ -102,6 +103,26 @@ class BigInteger extends Number
 	}
 	
 	/*
+	 * Multiply current number by -1
+	 */
+	public function Invert()
+	{
+		$this->positive = !$this->positive;
+	}
+
+	/*
+	 * Multiply current number by -1 and return the new one
+	 * 
+	 * @return BigInteger Inverted number
+	 */
+	public function GetInverted()
+	{
+		$result = clone $this;
+		$result->Invert();
+		return $result;
+	}
+
+	/*
 	 * Adds one digit to the Number
 	 */
 	protected function AddDigit()
@@ -121,8 +142,9 @@ class BigInteger extends Number
 		}
 		return $result;
 	}
+	
 	/*
-	 * @param BigInteger $number Number
+	 * @param BigInteger $number
 	 * @return boolean
 	 */
 	public function More(BigInteger $number)
@@ -162,7 +184,7 @@ class BigInteger extends Number
 	}
 	
 	/*
-	 * @param BigInteger $number Number
+	 * @param BigInteger $number
 	 * @return boolean
 	 */
 	public function Less(BigInteger $number)
@@ -253,6 +275,33 @@ class BigInteger extends Number
 			$i++;
 		}
 		$result->Normalize();
+		return $result;
+	}
+	
+	/*
+	 * Add $digits zeros to the end of the number
+	 * 
+	 * @param integer $digits
+	 */
+	public function Shift($digits)
+	{
+		if ($digits > 0)
+		{
+			$result = new self($this . str_repeat('0', $digits));
+			$this->number = $result->number;
+		}
+	}
+
+	/*
+	 * Add $digits zeros to the end of the number and return it
+	 * 
+	 * @param integer $digits
+	 * @return BigInteger
+	 */
+	public function GetShifted($digits)
+	{
+		$digits = max (0, $digits);
+		$result = new self($this . str_repeat('0', $digits));
 		return $result;
 	}
 
