@@ -33,7 +33,7 @@ class BigReal extends Number
 		$this->positive = $this->number->isPositive();
 	}
 	
-	protected function isPositive()
+	public function isPositive()
 	{
 		return $this->number->isPositive();
 	}
@@ -41,9 +41,9 @@ class BigReal extends Number
 	/*
 	 * Multiply current number by -1
 	 */
-	public function Invert()
+	public function invert()
 	{
-		$this->number->Invert();
+		$this->number->invert();
 	}
 
 	/*
@@ -51,13 +51,28 @@ class BigReal extends Number
 	 * 
 	 * @return BigInteger Inverted number
 	 */
-	public function GetInverted()
+	public function getInverted()
 	{
 		$result = clone $this;
 		$result->Invert();
 		return $result;
 	}
 
+	/*
+	 * Bring number's digits to base boundaries and remove zeros after the delimiter
+	 */
+	public function normalize()
+	{
+		$this->number->normalize();
+		$shiftCount = 0;
+		while ($this->shift > 0 && $this->number->getLastDigit() === 0)
+		{
+			$this->shift--;
+			$shiftCount--;
+		}
+		$this->number->getShifted($shiftCount);
+	}
+	
 	/*
 	 * @return Number as string
 	 */
@@ -86,12 +101,12 @@ class BigReal extends Number
 	 * @param BigReal $number
 	 * @return boolean
 	 */
-	public function More(BigReal $number)
+	public function more(BigReal $number)
 	{
 		//echo 'More'.$this.'!'.$number.'<br>';
 		if (!$this->isPositive() && !$number->isPositive())
 		{
-			return $this->GetInverted()->Less($number->GetInverted());
+			return $this->getInverted()->less($number->getInverted());
 		}
 		else if (!$this->isPositive())
 		{
@@ -104,11 +119,11 @@ class BigReal extends Number
 		else if ($this->shift != $number->shift)
 		{
 			$max = max($this->shift, $number->shift);
-			return $this->number->GetShifted($max - $this->shift)->More($number->number->GetShifted($max - $number->shift));
+			return $this->number->getShifted($max - $this->shift)->more($number->number->getShifted($max - $number->shift));
 		}
 		else
 		{
-			return $this->number->More($number->number);
+			return $this->number->more($number->number);
 		}
 	}
 	
@@ -116,11 +131,108 @@ class BigReal extends Number
 	 * @param BigReal $number
 	 * @return boolean
 	 */
-	public function Less(BigReal $number)
+	public function less(BigReal $number)
 	{
 		//echo 'Less'.$this.'!'.$number.'<br>';
-		return $number->More($this);
+		return $number->more($this);
 	}
-	
 
+	/*
+	 * @param BigReal $number Number to be added
+	 * @return BigReal The sum of two numbers
+	 */
+	public function plus(BigReal $number)
+	{
+		if (!$this->isPositive() && !$number->isPositive())
+		{
+			echo '1.'.$this.'!'.$number.'<br>';
+			$result = $this->getInverted()->plus($number->getInverted());
+			$result->invert();
+			return $result;
+		}
+		else if (!$this->isPositive() || !$number->isPositive())
+		{
+			echo '2.'.$this.'!'.$number.'<br>';
+			if ($this->isPositive())
+			{
+				return $this->minus($number->getInverted());
+			}
+			else
+			{
+				return $number->minus($this->getInverted());
+			}
+		}
+		else if ($this->shift != $number->shift)
+		{
+			echo '3.'.$this.'!'.$number.'<br>';
+			if ($this->shift < $number->shift)
+			{
+				$t = clone $this;
+				$t->number->shift($number->shift - $this->shift);
+				$t->shift += $number->shift - $this->shift;
+				return $t->Plus($number);
+			}
+			else if ($this->shift > $number->shift)
+			{
+				$t = clone $number;
+				$t->number->shift($this->shift - $number->shift);
+				$t->shift += $this->shift - $number->shift;
+				return $this->Plus($t);
+			}
+		}
+		echo '4.'.$this.'!'.$number.'<br>';
+		$result = clone $this;
+		$result->number = $result->number->plus($number->number);
+		return $result;
+	}
+
+	/*
+	 * @param BigReal $number Number to be subtracted
+	 * @return BigReal The difference between two numbers
+	 */
+	public function minus(BigReal $number)
+	{
+		if (!$number->isPositive())
+		{
+			echo '5.'.$this.'!'.$number.'<br>';
+			$result = $this->plus($number->getInverted());
+			return $result;
+		}
+		else if (!$this->isPositive())
+		{
+			echo '6.'.$this.'!'.$number.'<br>';
+			$result = $this->getInverted()->plus($number);
+			$result->invert();
+			return $result;
+		}
+		else if ($this->shift != $number->shift)
+		{
+			echo '9.'.$this.'!'.$number.'<br>';
+			if ($this->shift < $number->shift)
+			{
+				$t = clone $this;
+				$t->number->shift($number->shift - $this->shift);
+				$t->shift += $number->shift - $this->shift;
+				return $t->Minus($number);
+			}
+			else if ($this->shift > $number->shift)
+			{
+				$t = clone $number;
+				$t->number->shift($this->shift - $number->shift);
+				$t->shift += $this->shift - $number->shift;
+				return $this->Minus($t);
+			}
+		}
+		else if ($number->more($this))
+		{
+			echo '7.'.$this.'!'.$number.'<br>';
+			$result = $number->minus($this);
+			$result->invert();
+			return $result;
+		}
+		echo '8.'.$this.'!'.$number.'<br>';
+		$result = clone $this;
+		$result->number = $result->number->minus($number->number);
+		return $result;
+	}
 }

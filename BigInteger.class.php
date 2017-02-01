@@ -54,7 +54,7 @@ class BigInteger extends Number
 	/*
 	 * Bring number's digits to base boundaries
 	 */
-	protected function Normalize()
+	public function normalize()
 	{
 		$i = 0;
 		while (($i < $this->length()))
@@ -63,7 +63,7 @@ class BigInteger extends Number
 			{
 				if (!isset($this->number[$i+1]))
 				{
-					$this->AddDigit();
+					$this->addDigit();
 				}
 				$this->number[$i+1] += floor($this->number[$i] / self::base);
 				$this->number[$i] = $this->number[$i] % self::base;
@@ -105,7 +105,7 @@ class BigInteger extends Number
 	/*
 	 * Multiply current number by -1
 	 */
-	public function Invert()
+	public function invert()
 	{
 		$this->positive = !$this->positive;
 	}
@@ -115,43 +115,30 @@ class BigInteger extends Number
 	 * 
 	 * @return BigInteger Inverted number
 	 */
-	public function GetInverted()
+	public function getInverted()
 	{
 		$result = clone $this;
-		$result->Invert();
+		$result->invert();
 		return $result;
 	}
 
 	/*
 	 * Adds one digit to the Number
 	 */
-	protected function AddDigit()
+	protected function addDigit()
 	{
 		array_push($this->number, 0);
-	}
-	
-	/*
-	 * @return BigInteger Absolute value of the number
-	 */
-	public function Abs()
-	{
-		$result = clone $this;
-		if (!$result->isPositive())
-		{
-			$result->Invert();
-		}
-		return $result;
 	}
 	
 	/*
 	 * @param BigInteger $number
 	 * @return boolean
 	 */
-	public function More(BigInteger $number)
+	public function more(BigInteger $number)
 	{
 		if (!$this->isPositive() && !$number->isPositive())
 		{
-			return $this->GetInverted()->Less($number->GetInverted());
+			return $this->getInverted()->less($number->getInverted());
 		}
 		else if (!$this->isPositive())
 		{
@@ -187,32 +174,32 @@ class BigInteger extends Number
 	 * @param BigInteger $number
 	 * @return boolean
 	 */
-	public function Less(BigInteger $number)
+	public function less(BigInteger $number)
 	{
-		return $number->More($this);
+		return $number->more($this);
 	}
 	
 	/*
 	 * @param BigInteger $number Number to be added
 	 * @return BigInteger The sum of two numbers
 	 */
-	public function Plus(BigInteger $number)
+	public function plus(BigInteger $number)
 	{
 		if (!$this->isPositive() && !$number->isPositive())
 		{
-			$result = $this->GetInverted()->Plus($number->GetInverted());
-			$result->Invert();
+			$result = $this->getInverted()->plus($number->getInverted());
+			$result->invert();
 			return $result;
 		}
 		else if (!$this->isPositive() || !$number->isPositive())
 		{
 			if ($this->isPositive())
 			{
-				return $this->Minus($number->GetInverted());
+				return $this->minus($number->getInverted());
 			}
 			else
 			{
-				return $number->Minus($this->GetInverted());
+				return $number->minus($this->getInverted());
 			}
 		}
 		$result = clone $this;
@@ -221,21 +208,21 @@ class BigInteger extends Number
 		{
 			if (!isset($result->number[$i]))
 			{
-				$result->AddDigit();
+				$result->addDigit();
 			}
 			$result->number[$i] = $result->number[$i] + $number->number[$i];
 			if ($result->number[$i] >= self::base)
 			{
 				if (!isset($result->number[$i+1]))
 				{
-					$result->AddDigit();
+					$result->addDigit();
 				}
 				$result->number[$i+1] += floor($result->number[$i] / self::base);
 				$result->number[$i] = $result->number[$i] % self::base;
 			}
 			$i++;
 		}
-		$result->Normalize();
+		$result->normalize();
 		return $result;
 	}
 
@@ -243,23 +230,23 @@ class BigInteger extends Number
 	 * @param BigInteger $number Number to be subtracted
 	 * @return BigInteger The difference between two numbers
 	 */
-	public function Minus(BigInteger $number)
+	public function minus(BigInteger $number)
 	{
 		if (!$number->isPositive())
 		{
-			$result = $this->Plus($number->GetInverted());
+			$result = $this->plus($number->getInverted());
 			return $result;
 		}
 		else if (!$this->isPositive())
 		{
-			$result = $this->GetInverted()->Plus($number);
-			$result->Invert();
+			$result = $this->getInverted()->plus($number);
+			$result->invert();
 			return $result;
 		}
-		if ($number->More($this))
+		if ($number->more($this))
 		{
-			$result = $number->Minus($this);
-			$result->Invert();
+			$result = $number->minus($this);
+			$result->invert();
 			return $result;
 		}
 		$result = clone $this;
@@ -274,7 +261,7 @@ class BigInteger extends Number
 			}
 			$i++;
 		}
-		$result->Normalize();
+		$result->normalize();
 		return $result;
 	}
 	
@@ -283,11 +270,18 @@ class BigInteger extends Number
 	 * 
 	 * @param integer $digits
 	 */
-	public function Shift($digits)
+	public function shift($digits)
 	{
 		if ($digits > 0)
 		{
 			$result = new self($this . str_repeat('0', $digits));
+			$this->number = $result->number;
+		}
+		else if ($digits < 0)
+		{
+			$s = strval($this);
+			$digits = max(-strlen($s), $digits);
+			$result = new self(substr($s, 0, strlen($s) + $digits));
 			$this->number = $result->number;
 		}
 	}
@@ -298,11 +292,19 @@ class BigInteger extends Number
 	 * @param integer $digits
 	 * @return BigInteger
 	 */
-	public function GetShifted($digits)
+	public function getShifted($digits)
 	{
-		$digits = max (0, $digits);
-		$result = new self($this . str_repeat('0', $digits));
+		$result = clone $this;
+		$result->shift($digits);
 		return $result;
+	}
+	
+	/*
+	 * @return integer The last digit
+	 */
+	public function getLastDigit()
+	{
+		return $this->number[0] % 10;
 	}
 
 }
